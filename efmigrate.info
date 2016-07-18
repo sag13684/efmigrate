@@ -1,0 +1,11 @@
+name = "Electronic Festival d7 to d7 migration"
+description = "Migrate content from D7 site to D7"
+package = "Development"
+core = 7.x
+
+dependencies[] = migrate
+dependencies[] = migrate_d2d
+
+files[] = efmigrate.migrate.inc
+files[] = taxonomy.inc
+files[] = node.inc

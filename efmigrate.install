@@ -1,0 +1,56 @@
+<?php
+
+function efmigrate_install() {
+  $content_types = array('festivals', 'old_lineups');
+  $vocabularies = array('music_genre', 'dj', 'festicket_packages');
+
+  // Check if our field is not already created.
+  foreach ($content_types as $type) {
+    if (!field_info_field('field_legacy_nid')) {
+      // Create the field base.
+      $field = array(
+        'field_name' => 'field_legacy_nid',
+        'type' => 'text',
+      );
+      field_create_field($field);
+    }
+    if (!$instance = field_info_instance('node', 'field_legacy_nid', $type)) {
+      // Create the field instance on the bundle.
+      $instance = array(
+        'field_name' => 'field_legacy_nid',
+        'entity_type' => 'node',
+        'label' => 'Legacy Nid',
+        'bundle' => $type,
+        'widget' => array(
+          'type' => 'textfield',
+        ),
+      );
+      field_create_instance($instance);
+    }
+  }
+
+  foreach ($vocabularies as $vocabulary) {
+    if (!field_info_field('field_legacy_tid')) {
+      // Create the field base.
+      $field = array(
+        'field_name' => 'field_legacy_tid',
+        'type' => 'text',
+      );
+      field_create_field($field);
+    }
+    if (!$instance = field_info_instance('taxonomy_term', 'field_legacy_tid', $vocabulary)) {
+      // Create the field instance on the bundle.
+      $instance = array(
+        'field_name' => 'field_legacy_tid',
+        'entity_type' => 'taxonomy_term',
+        'label' => 'Legacy Tid',
+        'bundle' => $vocabulary,
+        'widget' => array(
+          'type' => 'textfield',
+        ),
+      );
+      field_create_instance($instance);
+    }
+  }
+
+}
