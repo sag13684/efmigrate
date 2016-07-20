@@ -77,31 +77,30 @@ function efmigrate_migrate_api() {
     $arguments += $common_arguments;
     $api['migrations'][$migration_name] = $arguments;
   }
-  /*
-    // Node migrations - each has its own class derived from the migrate_d2d class,
-    // specifying its particular field mappings and transformations. source_type
-    // and destination_type are required arguments.
-    $node_arguments = array(
-      'Festivals' => array(
-        'class_name' => 'FestivalsMigration',
-        'description' => t('Migration of festival nodes from Drupal 7'),
-        'source_type' => 'festivals',
-        'destination_type' => 'festivals',
-      ),
-      'OldLineups' => array(
-        'class_name' => 'OldLineupsMigration',
-        'description' => t('Migration of article nodes from Drupal 6'),
-        'source_type' => 'old_lineups',
-        'destination_type' => 'old_lineups',
-        'dependencies' => array('FesticketPackages','Dj', 'Genre'),
-      ),
-    );
 
-    foreach ($node_arguments as $migration_name => $arguments) {
-      $arguments += $common_arguments;
-      $api['migrations'][$migration_name] = $arguments;
-    }
-  */
-  //kpr($api);
-  return $api;
+  // Node migrations - each has its own class derived from the migrate_d2d class,
+  // specifying its particular field mappings and transformations. source_type
+  // and destination_type are required arguments.
+  $node_arguments = array(
+    'Festivals' => array(
+      'class_name' => 'FestivalsMigration',
+      'description' => t('Migration of festival nodes from Drupal 7'),
+      'source_type' => 'festivals',
+      'destination_type' => 'festivals',
+    ),
+    /*   'OldLineups' => array(
+         'class_name' => 'OldLineupsMigration',
+         'description' => t('Migration of article nodes from Drupal 6'),
+         'source_type' => 'old_lineups',
+         'destination_type' => 'old_lineups',
+         'dependencies' => array('FesticketPackages','Dj', 'Genre'),
+       ),*/
+  );
+
+  foreach ($node_arguments as $migration_name => $arguments) {
+    $arguments += $common_arguments;
+    $api['migrations'][$migration_name] = $arguments;
+
+    return $api;
+  }
 }
