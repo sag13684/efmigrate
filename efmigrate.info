@@ -5,6 +5,10 @@ core = 7.x
 
 dependencies[] = migrate
 dependencies[] = migrate_d2d
+dependencies[] = migrate_extras
+dependecies[] = migrate_extras_media
+
+
 
 files[] = efmigrate.migrate.inc
 files[] = taxonomy.inc

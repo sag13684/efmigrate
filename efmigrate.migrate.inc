@@ -98,7 +98,24 @@ function efmigrate_migrate_api() {
   foreach ($node_arguments as $migration_name => $arguments) {
     $arguments += $common_arguments;
     $api['migrations'][$migration_name] = $arguments;
-
-    return $api;
   }
+
+  $file_arguments = array(
+    'YoutubeFilesMigration' => array(
+      'class_name' => 'DrupalYoutube7Migration',
+      'description' => t('Migration of youtube medias'),
+    )
+  );
+
+  $file_extra_arguments = array(
+    'default_uid' => 1,
+   // 'source_dir' => '',
+  );
+  foreach ($file_arguments as $migration_name => $arguments) {
+    $arguments += $common_arguments;
+    $arguments += $file_extra_arguments;
+    $api['migrations'][$migration_name] = $arguments;
+  }
+
+  return $api;
 }

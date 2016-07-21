@@ -81,15 +81,19 @@ class FestivalsMigration extends EfNodeMigration {
       'uid',
     ));
 
+    $this->addFieldMapping('field_date:to', 'field_date:value2');
+
     $this->addFieldMapping('field_festicket_packages:source_type')
       ->defaultValue('tid');
     $this->addFieldMapping('field_festicket_packages:create_term')
       ->defaultValue(FALSE);
     $this->addFieldMapping('field_festicket_packages:ignore_case')
       ->defaultValue(FALSE);
+
     $this->addFieldMapping('field_genre_tags:source_type')->defaultValue('tid');
     $this->addFieldMapping('field_genre_tags:create_term')->defaultValue(FALSE);
     $this->addFieldMapping('field_genre_tags:ignore_case')->defaultValue(FALSE);
+
     $this->addFieldMapping('field_lineup_tags:source_type')
       ->defaultValue('tid');
     $this->addFieldMapping('field_lineup_tags:create_term')
@@ -108,13 +112,16 @@ class FestivalsMigration extends EfNodeMigration {
     $this->addFieldMapping('field_location:longitude', 'longitude');
     $this->addFieldMapping('field_location:source', 'source');
     $this->addFieldMapping('field_location:is_primary', 'is_primary');
-    $this->addFieldMapping('field_trailer:file_class')->defaultValue()
+    // In this case, we need to specify the file_class in the second paramter -
+    // this class understands how to translate a http://www.youtube.com/ URI
+    // into Drupal's Youtube file scheme (youtube://).
+    $this->addFieldMapping('field_trailer:file_class')
+      ->defaultValue('MigrateExtrasFileYoutube');
 
 
     $this->addUnmigratedSources(array(
       'body:language',
       'field_location:language',
-      'field_date:value2',
       'field_date:language',
       'field_visitors:language',
       'field_indoor:language',
@@ -130,12 +137,25 @@ class FestivalsMigration extends EfNodeMigration {
       'field_gemischt:language',
       'field_trailer:language',
       'field_lineup:language',
+      'field_age:language',
+      'field_add_thisf:language',
+      'field_confirmed:language',
+      'field_festicket_shop:language',
+      'field_festival_classification:language',
+      'field_lineup_tags:language',
+      'field_genre_tags:language',
+      'field_gemischt:language',
+      'field_trailer:language',
+      'field_lineup:language',
+      'field_visitors:language',
+      'field_indoor:language',
+      'field_ticket_price:language',
+      'field_type_of_event:language',
     ));
 
     $this->addUnmigratedDestinations(array(
       'field_date:rrule',
       'field_date:timezone',
-      'field_date:to',
       'field_festicket_url:title',
       'field_festicket_url:attributes',
       'field_festicket_url:language',
@@ -149,19 +169,62 @@ class FestivalsMigration extends EfNodeMigration {
       'field_preview_img:urlencode',
       'field_preview_img:alt',
       'field_preview_img:title',
-
     ));
   }
 
   public function prepareRow($row) {
     parent::prepareRow($row);
+
+    if ($row->nid == 1100) {
+      dsm($row);
+      exit;
+    }
+
+    if (isset($row->field_genre_tags) && !empty($row->field_genre_tags)) {
+      foreach ($row->field_genre_tags as $k => $genre) {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+          ->entityCondition('bundle', 'music_genre')
+          ->fieldCondition('field_legacy_tid', 'value', $genre);
+        $result = $query->execute();
+        if (isset($result['taxonomy_term'])) {
+          $row->field_genre_tags[$k] = array_shift(array_keys($result['taxonomy_term']));
+        }
+      }
+    }
+
+    if (isset($row->field_lineup_tags) && !empty($row->field_lineup_tags)) {
+      foreach ($row->field_lineup_tags as $k => $lineup_tag) {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+          ->entityCondition('bundle', 'dj')
+          ->fieldCondition('field_legacy_tid', 'value', $lineup_tag);
+        $result = $query->execute();
+        if (isset($result['taxonomy_term'])) {
+          $row->field_lineup_tags[$k] = array_shift(array_keys($result['taxonomy_term']));
+        }
+      }
+    }
+
+    if (isset($row->field_festicket_packages) && !empty($row->field_festicket_packages)) {
+      foreach ($row->field_festicket_packages as $k => $festicket_package) {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+          ->entityCondition('bundle', 'festicket_packages')
+          ->fieldCondition('field_legacy_tid', 'value', $festicket_package);
+        $result = $query->execute();
+        if (isset($result['taxonomy_term'])) {
+          $row->field_festicket_packages[$k] = array_shift(array_keys($result['taxonomy_term']));
+        }
+      }
+    }
   }
 
   protected function query() {
     $query = parent::query();
     // Join location table, which is not CCK
-    $query->LeftJoin('location_instance', 'i', 'i.nid = n.nid AND i.vid = n.vid');
-    $query->LeftJoin('location', 'l', 'l.lid = i.lid');
+    $query->leftJoin('location_instance', 'i', 'i.nid = n.nid AND i.vid = n.vid');
+    $query->leftJoin('location', 'l', 'l.lid = i.lid');
     $query->fields('l', array(
       'name',
       'street',
@@ -175,7 +238,8 @@ class FestivalsMigration extends EfNodeMigration {
       'source',
       'is_primary',
     ));
-
+    // $query->leftJoin('f', 'file_managed', '');
+    // $quer
     return $query; // TODO: Change the autogenerated stub
   }
 }
