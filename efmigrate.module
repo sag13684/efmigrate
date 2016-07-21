@@ -5,7 +5,7 @@
  */
 
 /**
- * Intentionally left empty, see migrate_d2d_example.migrate.inc
+ * Intentionally left empty, see efmigrate.migrate.inc
  * for the actual implementation.
  *
  * @link https://drupal.org/node/1006982

@@ -40,8 +40,7 @@ function efmigrate_migrate_api() {
   );
 
   // For vocabulary migrations, source_vocabulary and destination_vocabulary are
-  // required arguments. Note that in Drupal 6 vocabularies did not have machine
-  // names, so we use the vocabulary ID to uniquely identify them.
+  // required arguments.
   $vocabulary_arguments = array(
     'FesticketPackages' => array(
       'description' => t('Migration of Festicket Packages from Drupal 7'),
@@ -54,7 +53,6 @@ function efmigrate_migrate_api() {
       'class_name' => 'GenreTermMigration',
       'source_vocabulary' => 'music_genre',  // D7 Vocabulary name
       'destination_vocabulary' => 'music_genre',
-      //'dependencies' => array('Dj'),
     ),
     'Dj' => array(
       'description' => t('Migration of Festicket Packages from Drupal 7'),
@@ -88,13 +86,13 @@ function efmigrate_migrate_api() {
       'source_type' => 'festivals',
       'destination_type' => 'festivals',
     ),
-    /*   'OldLineups' => array(
-         'class_name' => 'OldLineupsMigration',
-         'description' => t('Migration of article nodes from Drupal 6'),
-         'source_type' => 'old_lineups',
-         'destination_type' => 'old_lineups',
-         'dependencies' => array('FesticketPackages','Dj', 'Genre'),
-       ),*/
+    'OldLineups' => array(
+      'class_name' => 'OldLineupsMigration',
+      'description' => t('Migration of article nodes from Drupal 6'),
+      'source_type' => 'old_lineups',
+      'destination_type' => 'old_lineups',
+      'dependencies' => array('FesticketPackages', 'Dj', 'Genre'),
+    ),
   );
 
   foreach ($node_arguments as $migration_name => $arguments) {

@@ -2,16 +2,17 @@
 
 /**
  * @file
- * Implementation of DrupalTerm7Migration for Drupal 7 sources.
+ * Implementation of DrupalTerm7Migration for Drupal 7 terms sources.
+ */
+
+/**
+ * Class GenreTermMigration
+ * 
+ * Migration for Genre terms.
  */
 class GenreTermMigration extends DrupalTerm7Migration {
   public function __construct(array $arguments) {
     parent::__construct($arguments);
-    /*$this->addFieldMapping('field_genre', 'field_genre');
-    $this->addFieldMapping('field_genre:source_type')->defaultValue(TRUE);
-    $this->addFieldMapping('field_genre:create_term')->defaultValue(FALSE);
-    $this->addFieldMapping('field_genre:ignore_case')->defaultValue(TRUE);
-    */
     $this->addFieldMapping('field_legacy_tid', 'tid')
       ->description(t('Legacy or Source tid'));
     $this->addUnmigratedDestinations(array(
@@ -24,13 +25,7 @@ class GenreTermMigration extends DrupalTerm7Migration {
     ));
     $this->addUnmigratedSources(array('field_genre', 'field_genre:language'));
   }
-
-  /**
-   * Review a data row after fetch, returning FALSE to skip it.
-   *
-   * @param $row
-   * @return bool
-   */
+  
   public function prepareRow($row) {
     parent::prepareRow($row);
   }
@@ -51,7 +46,11 @@ class GenreTermMigration extends DrupalTerm7Migration {
   }
 }
 
-
+/**
+ * Class DjTermMigration
+ * 
+ * Migration for Dj taxonomy terms.
+ */
 class DjTermMigration extends DrupalTerm7Migration {
   public function __construct(array $arguments) {
     parent::__construct($arguments);
@@ -117,13 +116,7 @@ class DjTermMigration extends DrupalTerm7Migration {
     ));
 
   }
-
-  /**
-   * Review a data row after fetch, returning FALSE to skip it.
-   *
-   * @param $row
-   * @return bool
-   */
+  
   public function prepareRow($row) {
     parent::prepareRow($row);
     if (!empty($row->field_genredj)) {
@@ -155,6 +148,12 @@ class DjTermMigration extends DrupalTerm7Migration {
   }
 }
 
+/**
+ * Class FesticketPackagesTerm7Migration
+ * 
+ * Migration for FesticketPackages taxonomy terms.
+ */
+
 class FesticketPackagesTerm7Migration extends DrupalTerm7Migration {
   public function __construct(array $arguments) {
     parent::__construct($arguments);
@@ -170,13 +169,7 @@ class FesticketPackagesTerm7Migration extends DrupalTerm7Migration {
       'field_ft_package_url:language',
     ));
   }
-
-  /**
-   * Review a data row after fetch, returning FALSE to skip it.
-   *
-   * @param $row
-   * @return bool
-   */
+  
   public function prepareRow($row) {
     parent::prepareRow($row);
   }
@@ -196,6 +189,13 @@ class FesticketPackagesTerm7Migration extends DrupalTerm7Migration {
     return $query;
   }
 }
+
+/**
+ * Class UpdateGenreTermMigration
+ * 
+ * Migration class to update Genre taxonomy term field Genre with Dj term 
+ * references.
+ */
 
 class UpdateGenreTermMigration extends DrupalTerm7Migration {
   /**

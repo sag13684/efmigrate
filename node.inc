@@ -1,6 +1,9 @@
 <?php
 
+
 /**
+ * Class EfNodeMigration
+ *
  * Common mappings for the Drupal 7 node migrations.
  */
 abstract class EfNodeMigration extends DrupalNode7Migration {
@@ -12,14 +15,20 @@ abstract class EfNodeMigration extends DrupalNode7Migration {
   }
 }
 
+
 /**
- * Image-specific mappings and handling.
+ * Class FestivalsMigration
+ *
+ * Migration class for Festivals node.
  */
 class FestivalsMigration extends EfNodeMigration {
 
   public function __construct(array $arguments) {
-
     parent::__construct($arguments);
+
+    // Remove  mapping to suppress warning.
+    $this->removeFieldMapping('uid');
+    $this->removeFieldMapping('body:language');
 
     $this->addSimpleMappings(array(
       'field_add_thisf',
@@ -69,9 +78,9 @@ class FestivalsMigration extends EfNodeMigration {
       'field_trailer:display',
       'field_trailer:description',
       'field_lineup_tags',
-
+      'uid',
     ));
-    $this->addFieldMapping('uid', 'uid');
+
     $this->addFieldMapping('field_festicket_packages:source_type')
       ->defaultValue('tid');
     $this->addFieldMapping('field_festicket_packages:create_term')
@@ -81,12 +90,29 @@ class FestivalsMigration extends EfNodeMigration {
     $this->addFieldMapping('field_genre_tags:source_type')->defaultValue('tid');
     $this->addFieldMapping('field_genre_tags:create_term')->defaultValue(FALSE);
     $this->addFieldMapping('field_genre_tags:ignore_case')->defaultValue(FALSE);
-    $this->addFieldMapping('field_lineup_tags:source_type')->defaultValue('tid');
-    $this->addFieldMapping('field_lineup_tags:create_term')->defaultValue(FALSE);
-    $this->addFieldMapping('field_lineup_tags:ignore_case')->defaultValue(FALSE);
+    $this->addFieldMapping('field_lineup_tags:source_type')
+      ->defaultValue('tid');
+    $this->addFieldMapping('field_lineup_tags:create_term')
+      ->defaultValue(FALSE);
+    $this->addFieldMapping('field_lineup_tags:ignore_case')
+      ->defaultValue(FALSE);
+
+    $this->addFieldMapping('field_location:name', 'name');
+    $this->addFieldMapping('field_location:street', 'street');
+    $this->addFieldMapping('field_location:additional', 'additional');
+    $this->addFieldMapping('field_location:city', 'city');
+    $this->addFieldMapping('field_location:province', 'province');
+    $this->addFieldMapping('field_location:postal_code', 'postal_code');
+    $this->addFieldMapping('field_location:country', 'country');
+    $this->addFieldMapping('field_location:latitude', 'latitude');
+    $this->addFieldMapping('field_location:longitude', 'longitude');
+    $this->addFieldMapping('field_location:source', 'source');
+    $this->addFieldMapping('field_location:is_primary', 'is_primary');
+    $this->addFieldMapping('field_trailer:file_class')->defaultValue()
+
 
     $this->addUnmigratedSources(array(
-      // 'body:language',
+      'body:language',
       'field_location:language',
       'field_date:value2',
       'field_date:language',
@@ -113,44 +139,52 @@ class FestivalsMigration extends EfNodeMigration {
       'field_festicket_url:title',
       'field_festicket_url:attributes',
       'field_festicket_url:language',
+      'field_preview_img',
+      'field_preview_img:file_class',
+      'field_preview_img:preserve_files',
+      'field_preview_img:destination_dir',
+      'field_preview_img:destination_file',
+      'field_preview_img:file_replace',
+      'field_preview_img:source_dir',
+      'field_preview_img:urlencode',
+      'field_preview_img:alt',
+      'field_preview_img:title',
+
     ));
-
-
-    // $this->addFieldMapping('revision')->defaultValue(FALSE);
-
-
   }
 
-  /**
-   * Implementation of Migration::prepareRow().
-   *
-   * Here we pull in additional data from a non-core, non-CCK table.
-   *
-   * @param $row
-   */
   public function prepareRow($row) {
-    if (parent::prepareRow($row) === FALSE) {
-      return FALSE;
-    }
+    parent::prepareRow($row);
+  }
 
-    $image_row = Database::getConnection('default', $this->sourceConnection)
-      ->select('custom_image_table', 'i')
-      ->fields('i', array('copyright', 'filename'))
-      ->condition('vid', $row->vid)
-      ->execute()
-      ->fetchObject();
-    if ($image_row) {
-      $row->copyright = $image_row->copyright;
-      $row->filename = $image_row->filename;
-    }
-    else {
-      $this->saveMessage(t('No custom_image_table data for image node with vid !vid',
-        array('!vid' => $row->vid)));
-    }
+  protected function query() {
+    $query = parent::query();
+    // Join location table, which is not CCK
+    $query->LeftJoin('location_instance', 'i', 'i.nid = n.nid AND i.vid = n.vid');
+    $query->LeftJoin('location', 'l', 'l.lid = i.lid');
+    $query->fields('l', array(
+      'name',
+      'street',
+      'additional',
+      'city',
+      'province',
+      'postal_code',
+      'country',
+      'latitude',
+      'longitude',
+      'source',
+      'is_primary',
+    ));
+
+    return $query; // TODO: Change the autogenerated stub
   }
 }
 
-
+/**
+ * Class OldLineupsMigration
+ *
+ * Migration for Oldlineups nodes.
+ */
 class OldLineupsMigration extends EfNodeMigration {
   public function __construct(array $arguments) {
     // Add any other data we're pulling into the source row, before the parent
