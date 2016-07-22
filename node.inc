@@ -173,12 +173,6 @@ class FestivalsMigration extends EfNodeMigration {
   }
 
   public function prepareRow($row) {
-    parent::prepareRow($row);
-
-    if ($row->nid == 1100) {
-      dsm($row);
-      exit;
-    }
 
     if (isset($row->field_genre_tags) && !empty($row->field_genre_tags)) {
       foreach ($row->field_genre_tags as $k => $genre) {
@@ -218,6 +212,17 @@ class FestivalsMigration extends EfNodeMigration {
         }
       }
     }
+
+    if (isset($row->field_trailer) && !empty($row->field_trailer)) {
+      $query = Database::getConnection('default', $this->sourceConnection)
+        ->select('file_managed', 'f')
+        ->condition('f.fid', $row->field_trailer)
+        ->fields('f', array('uri'));
+      $result = $query->execute()->fetchField();
+      $row->uri = $result;
+    }
+    parent::prepareRow($row);
+    dsm($row);
   }
 
   protected function query() {

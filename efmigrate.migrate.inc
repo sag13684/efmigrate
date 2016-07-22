@@ -85,6 +85,7 @@ function efmigrate_migrate_api() {
       'description' => t('Migration of festival nodes from Drupal 7'),
       'source_type' => 'festivals',
       'destination_type' => 'festivals',
+      'dependencies' => array('FesticketPackages', 'Dj', 'Genre', 'UpdateGenre'),
     ),
     'OldLineups' => array(
       'class_name' => 'OldLineupsMigration',
@@ -99,7 +100,7 @@ function efmigrate_migrate_api() {
     $arguments += $common_arguments;
     $api['migrations'][$migration_name] = $arguments;
   }
-
+/*
   $file_arguments = array(
     'YoutubeFilesMigration' => array(
       'class_name' => 'DrupalYoutube7Migration',
@@ -116,6 +117,6 @@ function efmigrate_migrate_api() {
     $arguments += $file_extra_arguments;
     $api['migrations'][$migration_name] = $arguments;
   }
-
+*/
   return $api;
 }
