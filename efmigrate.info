@@ -6,7 +6,22 @@ core = 7.x
 dependencies[] = migrate
 dependencies[] = migrate_d2d
 dependencies[] = migrate_extras
-dependecies[] = migrate_extras_media
+dependencies[] = addthis
+dependencies[] = date
+dependencies[] = emfield
+dependencies[] = file
+dependencies[] = file_entity
+dependencies[] = image
+dependencies[] = link
+dependencies[] = list
+dependencies[] = location_cck
+dependencies[] = number
+dependencies[] = options
+dependencies[] = relation_migrate
+dependencies[] = taxonomy
+dependencies[] = text
+dependencies[] = media_youtube
+
 
 
 

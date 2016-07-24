@@ -85,38 +85,27 @@ function efmigrate_migrate_api() {
       'description' => t('Migration of festival nodes from Drupal 7'),
       'source_type' => 'festivals',
       'destination_type' => 'festivals',
-      'dependencies' => array('FesticketPackages', 'Dj', 'Genre', 'UpdateGenre'),
+      'dependencies' => array(
+        'FesticketPackages',
+        'Dj',
+        'Genre',
+        'UpdateGenre'
+      ),
     ),
+    /*
     'OldLineups' => array(
       'class_name' => 'OldLineupsMigration',
       'description' => t('Migration of article nodes from Drupal 6'),
       'source_type' => 'old_lineups',
       'destination_type' => 'old_lineups',
-      'dependencies' => array('FesticketPackages', 'Dj', 'Genre'),
+      'dependencies' => array('FesticketPackages', 'Dj', 'Genre', 'Festivals'),
     ),
+    */
   );
 
   foreach ($node_arguments as $migration_name => $arguments) {
     $arguments += $common_arguments;
     $api['migrations'][$migration_name] = $arguments;
   }
-/*
-  $file_arguments = array(
-    'YoutubeFilesMigration' => array(
-      'class_name' => 'DrupalYoutube7Migration',
-      'description' => t('Migration of youtube medias'),
-    )
-  );
-
-  $file_extra_arguments = array(
-    'default_uid' => 1,
-   // 'source_dir' => '',
-  );
-  foreach ($file_arguments as $migration_name => $arguments) {
-    $arguments += $common_arguments;
-    $arguments += $file_extra_arguments;
-    $api['migrations'][$migration_name] = $arguments;
-  }
-*/
   return $api;
 }

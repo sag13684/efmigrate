@@ -4,17 +4,55 @@
  * @file
  * Implementation of DrupalTerm7Migration for Drupal 7 terms sources.
  */
+abstract class EfTermMigration extends DrupalTerm7Migration {
+  public function __construct(array $arguments) {
+    parent::__construct($arguments);
+    $elements = metatag_get_info();
+
+    foreach ($elements['tags'] as $value) {
+      $metatag_field = 'metatag_' . $value['name'];
+      $this->sourceFields[$metatag_field] = $value['description'];
+      $simple_mappings[] = $metatag_field;
+    }
+
+    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields);
+
+    $this->addFieldMapping('field_legacy_tid', 'tid')
+      ->description('We have a common field to save the D7 tid');
+    $this->addUnmigratedSources(array('data'));
+    $this->addSimpleMappings($simple_mappings);
+  }
+
+  public function prepareRow($row) {
+    parent::prepareRow($row);
+
+    if (isset($row->data) && !empty($row->data)) {
+      $data = unserialize($row->data);
+      foreach ($data as $k => $item) {
+        $row->{'metatag_' . $k} = $item;
+      }
+    }
+
+  }
+
+  protected function query() {
+    $query = parent::query();
+    $query->leftJoin('metatag', 'm', 'm.entity_id = td.tid');
+    $query->addField('th', 'parent', 'parent');
+    $query->fields('m', array('data'));
+    return $query;
+  }
+}
 
 /**
  * Class GenreTermMigration
- * 
+ *
  * Migration for Genre terms.
  */
-class GenreTermMigration extends DrupalTerm7Migration {
+class GenreTermMigration extends EfTermMigration {
   public function __construct(array $arguments) {
     parent::__construct($arguments);
-    $this->addFieldMapping('field_legacy_tid', 'tid')
-      ->description(t('Legacy or Source tid'));
+
     $this->addUnmigratedDestinations(array(
       'field_url_safe_name',
       // Ignore field_genre as we are later fetching the reference using GenreUpdateTermMigration.
@@ -25,33 +63,23 @@ class GenreTermMigration extends DrupalTerm7Migration {
     ));
     $this->addUnmigratedSources(array('field_genre', 'field_genre:language'));
   }
-  
+
   public function prepareRow($row) {
     parent::prepareRow($row);
   }
 
   protected function query() {
-    $query = Database::getConnection('default', $this->sourceConnection)
-      ->select('taxonomy_term_data', 'td')
-      ->fields('td', array('tid', 'name', 'description', 'weight', 'format'))
-      ->fields('th', array('parent'))
-      ->orderBy('th.parent')
-      ->distinct();
-    // Join to the hierarchy so we can sort on parent, but we'll pull the
-    // actual parent values in separately in case there are multiples.
-    $query->leftJoin('taxonomy_term_hierarchy', 'th', 'td.tid=th.tid');
-    $query->innerJoin('taxonomy_vocabulary', 'v', 'td.vid=v.vid');
-    $query->condition('v.machine_name', array($this->sourceVocabulary), 'IN');
+    $query = parent::query();
     return $query;
   }
 }
 
 /**
  * Class DjTermMigration
- * 
+ *
  * Migration for Dj taxonomy terms.
  */
-class DjTermMigration extends DrupalTerm7Migration {
+class DjTermMigration extends EfTermMigration {
   public function __construct(array $arguments) {
     parent::__construct($arguments);
     $this->addSimpleMappings(
@@ -108,15 +136,14 @@ class DjTermMigration extends DrupalTerm7Migration {
     $this->addFieldMapping('field_genredj:source_type')->defaultValue('tid');
     $this->addFieldMapping('field_genredj:create_term')->defaultValue(TRUE);
     $this->addFieldMapping('field_genredj:ignore_case')->defaultValue(TRUE);
-    $this->addFieldMapping('field_legacy_tid', 'tid')
-      ->description(t('Legacy or Source tid'));
+
     $this->addUnmigratedSources(array(
       'field_genredj:language',
       'field_bearbeitet_von:language',
     ));
 
   }
-  
+
   public function prepareRow($row) {
     parent::prepareRow($row);
     if (!empty($row->field_genredj)) {
@@ -133,71 +160,48 @@ class DjTermMigration extends DrupalTerm7Migration {
   }
 
   protected function query() {
-    $query = Database::getConnection('default', $this->sourceConnection)
-      ->select('taxonomy_term_data', 'td')
-      ->fields('td', array('tid', 'name', 'description', 'weight', 'format'))
-      ->fields('th', array('parent'))
-      ->orderBy('th.parent')
-      ->distinct();
-    // Join to the hierarchy so we can sort on parent, but we'll pull the
-    // actual parent values in separately in case there are multiples.
-    $query->leftJoin('taxonomy_term_hierarchy', 'th', 'td.tid=th.tid');
-    $query->innerJoin('taxonomy_vocabulary', 'v', 'td.vid=v.vid');
-    $query->condition('v.machine_name', array($this->sourceVocabulary), 'IN');
+    $query = parent::query();
     return $query;
   }
 }
 
 /**
  * Class FesticketPackagesTerm7Migration
- * 
+ *
  * Migration for FesticketPackages taxonomy terms.
  */
-
-class FesticketPackagesTerm7Migration extends DrupalTerm7Migration {
+class FesticketPackagesTerm7Migration extends EfTermMigration {
   public function __construct(array $arguments) {
     parent::__construct($arguments);
     $this->addSimpleMappings(array(
       'field_ft_package_url',
       'field_ft_package_image',
     ));
-    $this->addFieldMapping('field_legacy_tid', 'tid')
-      ->description(t('Legacy or Source tid'));
+
     $this->addUnmigratedDestinations(array(
       'field_ft_package_url:title',
       'field_ft_package_url:attributes',
       'field_ft_package_url:language',
     ));
   }
-  
+
   public function prepareRow($row) {
     parent::prepareRow($row);
   }
 
   protected function query() {
-    $query = Database::getConnection('default', $this->sourceConnection)
-      ->select('taxonomy_term_data', 'td')
-      ->fields('td', array('tid', 'name', 'description', 'weight', 'format'))
-      ->fields('th', array('parent'))
-      ->orderBy('th.parent')
-      ->distinct();
-    // Join to the hierarchy so we can sort on parent, but we'll pull the
-    // actual parent values in separately in case there are multiples.
-    $query->leftJoin('taxonomy_term_hierarchy', 'th', 'td.tid=th.tid');
-    $query->innerJoin('taxonomy_vocabulary', 'v', 'td.vid=v.vid');
-    $query->condition('v.machine_name', array($this->sourceVocabulary), 'IN');
+    $query = parent::query();
     return $query;
   }
 }
 
 /**
  * Class UpdateGenreTermMigration
- * 
- * Migration class to update Genre taxonomy term field Genre with Dj term 
+ *
+ * Migration class to update Genre taxonomy term field Genre with Dj term
  * references.
  */
-
-class UpdateGenreTermMigration extends DrupalTerm7Migration {
+class UpdateGenreTermMigration extends EfTermMigration {
   /**
    * Indicate whether the primary system of record for this migration is the
    * source, or the destination (Drupal). In the source case, migration of
@@ -214,6 +218,8 @@ class UpdateGenreTermMigration extends DrupalTerm7Migration {
   public function __construct(array $arguments) {
     parent::__construct($arguments);
     $this->systemOfRecord = Migration::DESTINATION;
+    $this->removeFieldMapping('field_legacy_tid');
+
     $this->addFieldMapping('tid', 'tid')->sourceMigration('Genre');
     $this->addSimpleMappings(array('field_genre'));
     $this->addFieldMapping('field_genre:source_type')->defaultValue(TRUE);
@@ -248,17 +254,7 @@ class UpdateGenreTermMigration extends DrupalTerm7Migration {
   }
 
   protected function query() {
-    $query = Database::getConnection('default', $this->sourceConnection)
-      ->select('taxonomy_term_data', 'td')
-      ->fields('td', array('tid', 'name', 'description', 'weight', 'format'))
-      ->fields('th', array('parent'))
-      ->orderBy('th.parent')
-      ->distinct();
-    // Join to the hierarchy so we can sort on parent, but we'll pull the
-    // actual parent values in separately in case there are multiples.
-    $query->leftJoin('taxonomy_term_hierarchy', 'th', 'td.tid=th.tid');
-    $query->innerJoin('taxonomy_vocabulary', 'v', 'td.vid=v.vid');
-    $query->condition('v.machine_name', array($this->sourceVocabulary), 'IN');
+    $query = parent::query();
     return $query;
   }
 }
