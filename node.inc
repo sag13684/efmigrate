@@ -17,7 +17,7 @@ abstract class EfNodeMigration extends DrupalNode7Migration {
       $simple_mappings[] = $metatag_field;
     }
 
-    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields);
+    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields, NULL, array('map_joinable' => FALSE));
 
     $this->addFieldMapping('field_legacy_nid', 'nid')
       ->description('We have a common field to save the D7 nid');
@@ -222,7 +222,8 @@ class FestivalsMigration extends EfNodeMigration {
           ->fieldCondition('field_legacy_tid', 'value', $genre);
         $result = $query->execute();
         if (isset($result['taxonomy_term'])) {
-          $row->field_genre_tags[$k] = array_shift(array_keys($result['taxonomy_term']));
+          $terms = array_keys($result['taxonomy_term']);
+          $row->field_genre_tags[$k] = array_shift($terms);
         }
       }
     }
@@ -235,7 +236,8 @@ class FestivalsMigration extends EfNodeMigration {
           ->fieldCondition('field_legacy_tid', 'value', $lineup_tag);
         $result = $query->execute();
         if (isset($result['taxonomy_term'])) {
-          $row->field_lineup_tags[$k] = array_shift(array_keys($result['taxonomy_term']));
+          $terms = array_keys($result['taxonomy_term']);
+          $row->field_lineup_tags[$k] = array_shift($terms);
         }
       }
     }
@@ -248,7 +250,8 @@ class FestivalsMigration extends EfNodeMigration {
           ->fieldCondition('field_legacy_tid', 'value', $festicket_package);
         $result = $query->execute();
         if (isset($result['taxonomy_term'])) {
-          $row->field_festicket_packages[$k] = array_shift(array_keys($result['taxonomy_term']));
+          $terms = array_keys($result['taxonomy_term']);
+          $row->field_festicket_packages[$k] = array_shift($terms);
         }
       }
     }
@@ -350,10 +353,11 @@ class OldLineupsMigration extends EfNodeMigration {
           ->fieldCondition('field_legacy_tid', 'value', $lineup_tag);
         $result = $query->execute();
         if (isset($result['taxonomy_term'])) {
-          $row->field_lineup_tags[$k] = array_shift(array_keys($result['taxonomy_term']));
+          $terms = array_keys($result['taxonomy_term']);
+          $row->field_lineup_tags[$k] = array_shift($terms);
         }
       }
     }
-
   }
+
 }

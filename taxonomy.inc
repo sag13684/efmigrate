@@ -15,7 +15,7 @@ abstract class EfTermMigration extends DrupalTerm7Migration {
       $simple_mappings[] = $metatag_field;
     }
 
-    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields);
+    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields, NULL, array('map_joinable' => FALSE));
 
     $this->addFieldMapping('field_legacy_tid', 'tid')
       ->description('We have a common field to save the D7 tid');
@@ -147,14 +147,15 @@ class DjTermMigration extends EfTermMigration {
   public function prepareRow($row) {
     parent::prepareRow($row);
     if (!empty($row->field_genredj)) {
+      foreach ($row->field_genredj as $k => $genredj)
       $query = new EntityFieldQuery();
       $query->entityCondition('entity_type', 'taxonomy_term')
         ->entityCondition('bundle', 'music_genre')
-        ->fieldCondition('field_legacy_tid', 'value', $row->field_genredj);
+        ->fieldCondition('field_legacy_tid', 'value', $genredj);
       $result = $query->execute();
       if (isset($result['taxonomy_term'])) {
-        $tid = array_keys($result['taxonomy_term']);
-        $row->field_genredj = array_shift($tid);
+        $terms = array_keys($result['taxonomy_term']);
+        $row->field_genredj[$k] = array_shift($terms);
       }
     }
   }
@@ -231,7 +232,7 @@ class UpdateGenreTermMigration extends EfTermMigration {
       'field_legacy_tid',
       'path',
     ));
-    $this->addUnmigratedSources(array('path'));
+    $this->addUnmigratedSources(array('path', 'field_genre:language'));
   }
 
   /**
@@ -243,14 +244,17 @@ class UpdateGenreTermMigration extends EfTermMigration {
   public function prepareRow($row) {
     parent::prepareRow($row);
     if (!empty($row->field_genre)) {
-      $query = new EntityFieldQuery();
-      $query->entityCondition('entity_type', 'taxonomy_term')
-        ->entityCondition('bundle', 'dj')
-        ->fieldCondition('field_legacy_tid', 'value', $row->field_genre);
-      $result = $query->execute();
+      foreach ($row->field_genre as $k => $genre) {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+          ->entityCondition('bundle', 'dj')
+          ->fieldCondition('field_legacy_tid', 'value', $genre);
+        $result = $query->execute();
 
-      if ($result['taxonomy_term']) {
-        $row->field_genre = array_shift(array_keys($result['taxonomy_term']));
+        if ($result['taxonomy_term']) {
+          $terms = array_keys($result['taxonomy_term']);
+          $row->field_genre[$k] = array_shift($terms);
+        }
       }
     }
   }
