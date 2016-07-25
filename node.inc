@@ -81,6 +81,9 @@ class FestivalsMigration extends EfNodeMigration {
       'field_festicket_shop',
       'field_festicket_shop:format',
       'field_festicket_url',
+      'field_festicket_url:title',
+      'field_festicket_url:attributes',
+      'field_festicket_url:language',
       'field_festival_classification',
       'field_gemischt',
       'field_genre_tags',
@@ -108,7 +111,6 @@ class FestivalsMigration extends EfNodeMigration {
       'field_youtube_promoter:attributes',
       'field_youtube_promoter:language',
       'field_trailer:display',
-      'field_trailer:description',
       'field_lineup_tags',
       'uid',
       'revision_uid',
@@ -188,14 +190,13 @@ class FestivalsMigration extends EfNodeMigration {
       'field_indoor:language',
       'field_ticket_price:language',
       'field_type_of_event:language',
+      'field_festicket_logo:language',
+      'field_trailer:description',
     ));
 
     $this->addUnmigratedDestinations(array(
       'field_date:rrule',
       'field_date:timezone',
-      'field_festicket_url:title',
-      'field_festicket_url:attributes',
-      'field_festicket_url:language',
       'field_preview_img',
       'field_preview_img:file_class',
       'field_preview_img:preserve_files',
@@ -206,6 +207,7 @@ class FestivalsMigration extends EfNodeMigration {
       'field_preview_img:urlencode',
       'field_preview_img:alt',
       'field_preview_img:title',
+      'field_trailer:description',
     ));
   }
 

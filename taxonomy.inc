@@ -219,6 +219,7 @@ class UpdateGenreTermMigration extends EfTermMigration {
     parent::__construct($arguments);
     $this->systemOfRecord = Migration::DESTINATION;
     $this->removeFieldMapping('field_legacy_tid');
+    $this->removeFieldMapping('path');
 
     $this->addFieldMapping('tid', 'tid')->sourceMigration('Genre');
     $this->addSimpleMappings(array('field_genre'));
@@ -228,8 +229,9 @@ class UpdateGenreTermMigration extends EfTermMigration {
     $this->addUnmigratedDestinations(array(
       'field_url_safe_name',
       'field_legacy_tid',
+      'path',
     ));
-    $this->addUnmigratedSources(array('field_genre:language'));
+    $this->addUnmigratedSources(array('path'));
   }
 
   /**
