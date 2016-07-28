@@ -29,3 +29,4 @@ dependencies[] = media_youtube
 files[] = efmigrate.migrate.inc
 files[] = taxonomy.inc
 files[] = node.inc
+files[] = relation.inc

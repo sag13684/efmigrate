@@ -92,7 +92,6 @@ function efmigrate_migrate_api() {
         'UpdateGenre'
       ),
     ),
-    /*
     'OldLineups' => array(
       'class_name' => 'OldLineupsMigration',
       'description' => t('Migration of article nodes from Drupal 6'),
@@ -100,12 +99,30 @@ function efmigrate_migrate_api() {
       'destination_type' => 'old_lineups',
       'dependencies' => array('FesticketPackages', 'Dj', 'Genre', 'Festivals'),
     ),
-    */
   );
 
   foreach ($node_arguments as $migration_name => $arguments) {
     $arguments += $common_arguments;
     $api['migrations'][$migration_name] = $arguments;
   }
+
+  $relation_arguments = array(
+    'FestivalsRelation' => array(
+      'class_name' => 'FestivalsOnlyRelations',
+      'description' => t('Migration of festival nodes from Drupal 7'),
+      'source_type' => 'festivals_only',
+      'destination_type' => 'festivals_only',
+      'max_arity' => 2,
+      'sm_endpoint_source_bundle' => 'old_lineups',
+      'sm_endpoint_target_bundle' => 'old_lineups',
+    //  'dependencies' => array( 'OldLineups'),
+    ),
+  );
+
+  foreach ($relation_arguments as $migration_name => $arguments) {
+    $arguments += $common_arguments;
+    $api['migrations'][$migration_name] = $arguments;
+  }
+
   return $api;
 }

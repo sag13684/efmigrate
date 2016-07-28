@@ -121,6 +121,7 @@ class FestivalsMigration extends EfNodeMigration {
     $this->addSimpleMappings($simple_mappings);
 
     $this->addFieldMapping('field_date:to', 'field_date:value2');
+    $this->addFieldMapping('field_date:timezone')->defaultValue('Europe/Paris');
 
     $this->addFieldMapping('field_festicket_packages:source_type')
       ->defaultValue('tid');
@@ -196,7 +197,6 @@ class FestivalsMigration extends EfNodeMigration {
 
     $this->addUnmigratedDestinations(array(
       'field_date:rrule',
-      'field_date:timezone',
       'field_preview_img',
       'field_preview_img:file_class',
       'field_preview_img:preserve_files',
@@ -314,7 +314,6 @@ class OldLineupsMigration extends EfNodeMigration {
     $this->addSimpleMappings(array(
       'field_lineup_tags',
       'field_date',
-      'field_festival',
       'uid',
       'revision_uid',
       'log',
@@ -322,6 +321,9 @@ class OldLineupsMigration extends EfNodeMigration {
     ));
 
     $this->addFieldMapping('field_date:to', 'field_date:value2');
+    $this->addFieldMapping('field_date:timezone')->defaultValue('Europe/Paris');
+    $this->addFieldMapping('field_festival', 'field_festival');
+
     $this->addFieldMapping('field_lineup_tags:source_type')
       ->defaultValue('tid');
     $this->addFieldMapping('field_lineup_tags:create_term')
@@ -335,7 +337,6 @@ class OldLineupsMigration extends EfNodeMigration {
       'body',
     ));
     $this->addUnmigratedDestinations(array(
-      'field_date:timezone',
       'field_date:rrule',
     ));
 
