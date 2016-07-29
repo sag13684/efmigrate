@@ -20,10 +20,10 @@ class FestivalsOnlyRelations extends DrupalRelationMigration {
       'changed',
       'uid',
       'endpoints',
-      'endpoints:entity_id',
+     // 'endpoints:entity_id',
       'endpoints:r_index',
     ));
-
+    $this->addFieldMapping('endpoints:entity_id');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addUnmigratedSources(array(
       'rid',

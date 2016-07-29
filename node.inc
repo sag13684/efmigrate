@@ -322,7 +322,7 @@ class OldLineupsMigration extends EfNodeMigration {
 
     $this->addFieldMapping('field_date:to', 'field_date:value2');
     $this->addFieldMapping('field_date:timezone')->defaultValue('Europe/Paris');
-    $this->addFieldMapping('field_festival', 'field_festival');
+    //$this->addFieldMapping('field_festival', 'field_festival')->sourceMigration();
 
     $this->addFieldMapping('field_lineup_tags:source_type')
       ->defaultValue('tid');
@@ -360,5 +360,4 @@ class OldLineupsMigration extends EfNodeMigration {
       }
     }
   }
-
 }

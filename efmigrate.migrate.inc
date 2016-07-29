@@ -113,8 +113,8 @@ function efmigrate_migrate_api() {
       'source_type' => 'festivals_only',
       'destination_type' => 'festivals_only',
       'max_arity' => 2,
-      'sm_endpoint_source_bundle' => 'old_lineups',
-      'sm_endpoint_target_bundle' => 'old_lineups',
+      'sm_endpoint_source_bundle' => 'oldlineups',
+      'sm_endpoint_target_bundle' => 'festivals',
     //  'dependencies' => array( 'OldLineups'),
     ),
   );
